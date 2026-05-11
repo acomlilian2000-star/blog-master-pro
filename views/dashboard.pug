@@ -1,0 +1,81 @@
+
+extends layout
+
+block content
+  .container.mt-4
+    .row
+      if currentUser && currentUser.role !== 'admin'
+        .col-md-4
+          .card.shadow-sm.border-0.mb-4
+            .card-header.bg-primary.text-white
+              h5.mb-0 
+                i.fas.fa-pen-fancy.me-2
+                | New Submission
+            .card-body
+              form(action="/blogs/add" method="POST")
+                .mb-3
+                  label.form-label.fw-bold Title
+                  input.form-control(name="title" type="text" placeholder="Enter a catchy title..." required)
+                .mb-3
+                  label.form-label.fw-bold Content
+                  textarea.form-control(name="description" rows="5" placeholder="What's on your mind?" required)
+                button.btn.btn-success.w-100(type="submit") 
+                  i.fas.fa-paper-plane.me-1
+                  | Submit Blog
+      div(class=(currentUser && currentUser.role === 'admin') ? 'col-md-12' : 'col-md-8')
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2 
+            i.fas.fa-stream.me-2.text-secondary
+            | Blog Feed
+          span.badge.bg-secondary #{blogs.length} Total Posts
+
+        if blogs.length > 0
+          each blog in blogs
+            .card.shadow-sm.mb-4.border-0
+              .card-body
+                .d-flex.justify-content-between.align-items-start
+                  div
+                    h4.card-title.text-primary.mb-1= blog.title
+                    p.small.text-muted.mb-3
+                      i.fas.fa-user.me-1
+                      | By: #{blog.author.firstName} #{blog.author.lastName} 
+                      span.mx-2 |
+                      i.fas.fa-calendar-alt.me-1
+                      | #{new Date(blog.dateCreated).toLocaleDateString()}
+                  
+                  // Status Badges
+                  if blog.approveStatus === 'approved'
+                    span.badge.rounded-pill.bg-success Approved
+                  else if blog.approveStatus === 'rejected'
+                    span.badge.rounded-pill.bg-danger Rejected
+                  else
+                    span.badge.rounded-pill.bg-warning.text-dark Pending
+
+                p.card-text.text-secondary(style="white-space: pre-wrap;")= blog.description
+                
+                hr.text-light
+                
+                .d-flex.justify-content-between.align-items-center
+                  //- ADMIN ONLY: Approval Controls
+                  if currentUser && currentUser.role === 'admin'
+                    .admin-actions.bg-light.p-2.rounded
+                      form.d-flex.align-items-center(action=`/blogs/edit/${blog._id}` method="POST")
+                        label.small.fw-bold.me-2(for="status") Moderate:
+                        select.form-select.form-select-sm.me-2(name="approveStatus" style="width: auto;")
+                          option(value="pending" selected=blog.approveStatus === 'pending') Pending
+                          option(value="approved" selected=blog.approveStatus === 'approved') Approve
+                          option(value="rejected" selected=blog.approveStatus === 'rejected') Reject
+                        button.btn.btn-sm.btn-primary(type="submit") Update
+                  
+                  div
+                    //- DELETE ACTION (ADMIN ONLY)
+                    if currentUser && currentUser.role === 'admin'
+                      form(action=`/blogs/delete/${blog._id}` method="POST" onsubmit="return confirm('Wait! Are you sure you want to delete this blog? This cannot be undone.')")
+                        button.btn.btn-sm.btn-outline-danger
+                          i.fas.fa-trash-alt.me-1
+                          | Delete Blog
+
+        else
+          .text-center.py-5.bg-light.rounded
+            i.fas.fa-ghost.fa-3x.text-muted.mb-3
+            p.text-muted No blogs found. Be the first to write one!

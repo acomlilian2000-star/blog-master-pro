@@ -1,0 +1,28 @@
+
+extends layout
+
+block content
+  .row.justify-content-center
+    .col-md-6
+      h2 Register User Here 
+
+      form(action="/register" method="POST")
+
+        label.form-label First Name
+        input.form-control.mb-2(name="firstName" placeholder="Enter first name" required)
+
+        label.form-label Last Name
+        input.form-control.mb-2(name="lastName" placeholder="Enter last name" required)
+
+        label.form-label Email
+        input.form-control.mb-2(name="email" type="email" placeholder="Enter email" required)
+
+        label.form-label Password
+        input.form-control.mb-2(name="password" type="password" placeholder="Enter password" required)
+
+        label.form-label Role
+        select.form-control.mb-3(name="role")
+          option(value="user") User (Writer)
+          option(value="admin") Admin (Approver)
+
+        button.btn.btn-primary.w-100 Register

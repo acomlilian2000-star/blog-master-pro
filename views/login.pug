@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .row.justify-content-center
+    .col-md-6
+      h2 Secure Login
+
+      form(action="/login" method="POST")
+
+        label.form-label Email
+        input.form-control.mb-2(type="email" name="email" placeholder="Enter email" required)
+
+        label.form-label Password
+        input.form-control.mb-2(type="password" name="password" placeholder="Enter password" required)
+
+        button.btn.btn-primary.w-100 Login
