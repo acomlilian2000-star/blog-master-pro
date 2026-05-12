@@ -3,9 +3,9 @@ const router = express.Router();
 const Blog = require('../models/Blog');
 const { ensureAuthenticated } = require('../middleware/auth');
 
-// @route   GET /dashboard
-// @desc    View all blogs
-// @access  Private
+//  GET /dashboard
+//    View all blogs
+//  Private
 router.get('/dashboard', ensureAuthenticated, async (req, res) => {
   try {
     // .populate('author') lets us access the user's name instead of just their ID
@@ -17,12 +17,12 @@ router.get('/dashboard', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// @route   POST /blogs/add
-// @desc    Create a new blog
-// @access  Private (Writers Only)
+//    POST /blogs/add
+//  Create a new blog
+//  Private (Writers Only)
 router.post('/blogs/add', ensureAuthenticated, async (req, res) => {
   try {
-    // NEW: Block Admin from writing blogs as per your requirement
+    //  Block Admin from writing blogs as per your requirement
     if (req.user.role === 'admin') {
       req.flash('error_msg', 'Admins are only authorized to review blogs, not create them.');
       return res.redirect('/dashboard');
@@ -33,7 +33,7 @@ router.post('/blogs/add', ensureAuthenticated, async (req, res) => {
     const newBlog = new Blog({
       title,
       description,
-      author: req.user._id // Automatically link the blog to the logged-in user
+      author: req.user._id 
     });
 
     await newBlog.save();
@@ -45,12 +45,12 @@ router.post('/blogs/add', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// @route   POST /blogs/delete/:id
-// @desc    Remove a blog
-// @access  Private (Owner or Admin)
+//   POST /blogs/delete/:id
+//    Remove a blog
+//   Private (Owner or Admin)
 router.post('/blogs/delete/:id', ensureAuthenticated, async (req, res) => {
   try {
-    // Bonus Logic: Ensure users can only delete THEIR blogs (unless they are admin)
+    //  Ensure users can only delete THEIR blogs (unless they are admin)
     const blog = await Blog.findById(req.params.id);
 
     if (!blog) {
@@ -58,7 +58,6 @@ router.post('/blogs/delete/:id', ensureAuthenticated, async (req, res) => {
     }
 
     // Check if user owns the blog OR is an admin
-    // Note: passport-local-mongoose provides .id as a string getter for ._id
     if (blog.author.toString() !== req.user.id && req.user.role !== 'admin') {
       req.flash('error_msg', 'Not authorized to delete this blog');
       return res.redirect('/dashboard');

@@ -3,14 +3,14 @@ const router = express.Router();
 const Blog = require('../models/Blog');
 const { isAdmin } = require('../middleware/auth');
 
-// @route   POST /blogs/edit/:id
-// @desc    Update blog status
-// @access  Private (Admin Only)
+//   POST /blogs/edit/:id
+//    Update blog status
+//  Private (Admin Only)
 router.post('/blogs/edit/:id', isAdmin, async (req, res) => {
   try {
     const { approveStatus } = req.body;
     
-    // Find the blog and update its status
+    // Find the blog and update its status (only admin)
     await Blog.findByIdAndUpdate(req.params.id, { approveStatus });
 
     req.flash('success_msg', `Blog status updated to ${approveStatus}`);
